@@ -1,0 +1,13 @@
+{:paths ["src"]
+ :tasks
+ {test {:doc "Run the tests"
+        :extra-paths ["test"]
+        :requires ([clojure.test :as t]
+                   [plugbench.nats-test]
+                   [plugbench.fre-pluggo.item-test]
+                   [plugbench.fre-pluggo.daemon-test])
+        :task (let [{:keys [fail error]} (t/run-tests 'plugbench.nats-test
+                                                      'plugbench.fre-pluggo.item-test
+                                                      'plugbench.fre-pluggo.daemon-test)]
+                (when (pos? (+ fail error))
+                  (System/exit 1)))}}}

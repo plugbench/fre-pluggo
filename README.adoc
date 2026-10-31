@@ -1,0 +1,47 @@
+fre-pluggo
+==========
+
+A frecency store for plugbench: it remembers what has been visited, and lists
+it most frecent first.  It wraps https://github.com/camdencheek/fre[fre], which
+does the remembering and the ranking.
+
+Running
+-------
+
+`fre-pluggo daemon` keeps the store, in `$XDG_STATE_HOME/fre-pluggo/store.json`
+unless given `--store FILE`.  One daemon is enough for the NATS servers which
+are connected together.  It should be run persistently, with something like
+systemd or launchd, which should restart it when it exits, as it does when the
+connection to NATS goes away.
+
+Like the other pluggos, it connects to the local NATS server with the token in
+`$NATS_TOKEN`.  `$NATS_URL` connects it elsewhere.
+
+Items
+-----
+
+Anything can be visited, but files are `file://` URLs with a host name, as the
+plumber makes them, so that the store can be shared by hosts.  Paths in them
+are kept unescaped, and directories end with a slash, so that the URL of a
+directory is a prefix of the URLs of only the things in it.  A visit to a place
+in a file (`#line=4`) is a visit to the file.
+
+Subjects
+--------
+
+`cmd.add.frecent`::
+  Records a visit to the item in the data.  Replies `ok`, or `ERROR: ...`.
+  Something which won't wait for a reply can send it without a reply subject.
+
+`cmd.get.frecent`::
+  Replies with the items, one per line and most frecent first, which start with
+  the data, or all of them if it is empty.  The list is cut short to fit in a
+  NATS message.
+
+Command line
+------------
+
+----
+fre-pluggo add [-w DIR] ITEM...        # visit URLs or paths
+fre-pluggo list [-w DIR] [-p] [ITEM]   # list, optionally under ITEM, as paths with -p
+----

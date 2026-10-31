@@ -1,0 +1,8 @@
+Changes
+=======
+
+Unreleased
+----------
+* `fre-pluggo daemon` keeps a fre store, answering `cmd.add.frecent` and
+  `cmd.get.frecent`.
+* `fre-pluggo add` and `fre-pluggo list` visit and list through the daemon.
